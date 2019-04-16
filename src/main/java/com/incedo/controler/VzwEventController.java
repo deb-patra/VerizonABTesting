@@ -210,9 +210,12 @@ public class VzwEventController {
     	System.out.println("--------Triggering email-------");
     	ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
     	String imageName = null;
+    	String subject = null;
     	if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
     		imageName = "email-music.png";
+    		subject = "VZW AB Testing - Email experiment Testing";
 		} else {
+			subject = "VZW AB Testing - Email control Testing";
 			imageName = "email-video.png";
 		}
     	EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promoEmail");
@@ -240,12 +243,7 @@ public class VzwEventController {
                   	+ "</br>"
                     +"<a href=\""+url+"\">Click Promo</a></body>"
                 + "</html>", true);
-        /*helper.addInline("rightSideImage",
-                new File("C:\\deb\\Spring\\ABTesting\\VerizonABTesting\\src\\main\\resources\\static\\images\\cart_blue.png"));
- 
-        helper.addInline("leftSideImage",
-                new File("C:\\deb\\Spring\\ABTesting\\VerizonABTesting\\src\\main\\resources\\static\\images\\cart_blue.png"));*/
-        helper.setSubject("VZW AB Testing - Email event Testing");
+        helper.setSubject(subject);
         sender.send(message);
     }
 }
