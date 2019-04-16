@@ -62,13 +62,13 @@ public class VzwEventController {
 	}
 
 
-	@RequestMapping({"/vz/home","/vz/","/",""})
+	@RequestMapping({"/home","/",""})
 	public String getHomePage() {
 		return "home";
 	}
 	
 	
-	@RequestMapping("/vz/getPromoPage")
+	@RequestMapping("/getPromoPage")
     public String getGridwallPageWithoutParam(HttpServletRequest request, @RequestHeader(value="User-Agent", defaultValue="mobile") String userAgent, Model model) {
     	System.out.println("With in get gridwall details");
     	String userId = request.getParameter("userId");
@@ -98,7 +98,7 @@ public class VzwEventController {
 	 * @return
 	 */
     
-    @RequestMapping("/vz/promoPage/{userId}/{emailId}")
+    @RequestMapping("/promoPage/{userId}/{emailId}")
     public String getPromoPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
     	if(!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(emailId)) {
     		
@@ -119,7 +119,7 @@ public class VzwEventController {
     		}
     		
     		// Setting Attributes for UI
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz"+checkoutPage, "gridwall", "grid_wall", null);
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, checkoutPage, "gridwall", "grid_wall", null);
     		
     		// Generating new event
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promo");
@@ -134,7 +134,7 @@ public class VzwEventController {
         return "gridwall";
     }
     
-    @RequestMapping("/vz/checkoutPage/{userId}/{emailId}")
+    @RequestMapping("/checkoutPage/{userId}/{emailId}")
     public String getCheckoutPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
     	System.out.println("With in get checkout details");
     	if(!StringUtils.isEmpty(userId)) {
@@ -149,7 +149,7 @@ public class VzwEventController {
     		} else {
     			showNormalHeader(model, "checkout");
     		}
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/vz/promoPage/");
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/promoPage/");
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "checkout");
     		System.out.println("eventSubmit::::Checkout::::"+eventSubmit.toString());
     		eventService.pushNewEvent(eventSubmit);
