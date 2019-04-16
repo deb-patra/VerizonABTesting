@@ -1,5 +1,6 @@
 package com.incedo.controler;
 
+import java.io.File;
 import java.util.Base64;
 
 import javax.mail.internet.MimeMessage;
@@ -160,25 +161,21 @@ public class VzwEventController {
         return "gridwall";
     }
     public void showEmailPromo(Model model, String pageHeading) {
-		String eventColor = "green";
-		String color = "green";
-		if(!StringUtils.isEmpty(color) && "default".equals(color)) {
-			eventColor = "default";
+		if("gridwall".equalsIgnoreCase(pageHeading)) {
+			model.addAttribute("eventColor", "Variation 1 - music streaming");
 		} else {
-			eventColor = pageHeading + "_" + color;
+			model.addAttribute("eventColor", "Plan Upgrade success");
 		}
-		model.addAttribute("eventColor", eventColor);
+		
     }
     
     public void showNormalHeader(Model model, String pageHeading) {
-    	String eventColor = null;
-		String color = "blue";
-		if(!StringUtils.isEmpty(color) && "default".equals(color)) {
-			eventColor = "default";
+    	if("gridwall".equalsIgnoreCase(pageHeading)) {
+    		model.addAttribute("eventColor", "Variation 2 - video streaming");
 		} else {
-			eventColor = pageHeading + "_" + color;
+			model.addAttribute("eventColor", "Plan Upgrade success");
 		}
-		model.addAttribute("eventColor", eventColor);
+		
     }
     
     @RequestMapping("/sendEmails/{userId}")
@@ -196,15 +193,56 @@ public class VzwEventController {
         return "emailSuccess";
     }
     
+    @RequestMapping("/sendEmails/{userId}/{emailId}")
+    public String openEmailEvent(@PathVariable String userId, @PathVariable String emailId, Model model) {
+    	byte[] decodedBytes = Base64.getDecoder().decode(emailId);
+		String decodedString = new String(decodedBytes);
+		System.out.println("decodedString-->"+decodedString);
+		emailId = decodedString;
+    	ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
+    	EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "openEmail");
+		System.out.println("eventSubmit::::email::::"+eventSubmit.toString());
+		eventService.pushNewEvent(eventSubmit);
+        return "emailSuccess";
+    }
+    
     public void sendEmail(String emailId, String userId) throws Exception {
     	System.out.println("--------Triggering email-------");
+    	ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
+    	String imageName = null;
+    	if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
+    		imageName = "email-music.png";
+		} else {
+			imageName = "email-video.png";
+		}
+    	EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promoEmail");
+		System.out.println("eventSubmit::::email::::"+eventSubmit.toString());
+		eventService.pushNewEvent(eventSubmit);
         MimeMessage message = sender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         String encodedString = Base64.getEncoder().encodeToString(emailId.getBytes());
-        String url = domainName+userId+"/"+encodedString;
-        System.out.println("--------encodedString-------"+encodedString+", -----------url---------"+url);
+        String url = domainName+"/promoPage/"+userId+"/"+encodedString;
+        String openMailUrl = domainName+"/vz/sendEmails/"+userId+"/"+encodedString;
+        System.out.println("--------encodedString-------"+encodedString+", -----------url---------"+url+"-------openMailUrl--------"+openMailUrl);
         helper.setTo(emailId);
-        helper.setText("<html><body>Hi There! <a href=\""+url+"\">click here</a><body></html>", true);
+        helper.setText(
+                "<html>"
+                + "<body>"
+                 + "<div>"
+                    + "<div></div>"
+                    + "<div>"
+                    + "<a href=\""+url+"\"><img src='http://ec2-18-211-84-216.compute-1.amazonaws.com/images/"+imageName+"' style='float:left;width:600px;height:600px;'/></a>"
+                    + "<div></div>"  + "<div>"
+                    + "<img src=\""+openMailUrl+"\" style='float:left;width:1px;height:1px;'/>"
+                    + "</div>"
+                    + "</br>"
+                  + "</div></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br><a href=\""+url+"\">Click Promo</a></body>"
+                + "</html>", true);
+        /*helper.addInline("rightSideImage",
+                new File("C:\\deb\\Spring\\ABTesting\\VerizonABTesting\\src\\main\\resources\\static\\images\\cart_blue.png"));
+ 
+        helper.addInline("leftSideImage",
+                new File("C:\\deb\\Spring\\ABTesting\\VerizonABTesting\\src\\main\\resources\\static\\images\\cart_blue.png"));*/
         helper.setSubject("VZW AB Testing - Email event Testing");
         sender.send(message);
     }
