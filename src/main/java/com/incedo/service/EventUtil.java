@@ -20,20 +20,10 @@ public class EventUtil {
 	
 	public String incedoGetVariantToken(ExperimentVariantVo experimentVariantVo) {
 		String variantToken = experimentVariantVo.getVariantToken();
-		if(!StringUtils.isEmpty(variantToken)) {
-			if(variantToken.toLowerCase().contains("red")) {
-				return "UI_RED_EXP";
-			} else if(variantToken.toLowerCase().contains("green")) {
-				return "UI_GREEN_EXP";
-			}else if(variantToken.toLowerCase().contains("blue")) {
-				return "UI_BLUE_EXP";
-			}else if(variantToken.toLowerCase().contains("control")) {
-				return "UI_BLUE_EXP";
-			}else if(variantToken.toLowerCase().contains("life_style")) {
-				return "life_style_model1";
-			}
+		if(!StringUtils.isEmpty(variantToken) && variantToken.toLowerCase().contains("email")) {
+			return "EMAIL_PROMO_EXP";
 		}
-		return "EMAIL_PROMO_EXP";
+		return "control";
 	}
 	
 	public void setModelAttribute(Model model, ExperimentVariantVo experimentVariantVo, String nextPage, String pageHeading, String stage, String previousPage) {

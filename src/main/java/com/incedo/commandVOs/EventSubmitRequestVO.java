@@ -9,7 +9,7 @@ package com.incedo.commandVOs;
  */
 public class EventSubmitRequestVO {
 	private String user_id;
-	private String email_id;
+	private String email;
 	private String evt_id;
 	private int variant_id;
 	private int exp_id;
@@ -19,16 +19,16 @@ public class EventSubmitRequestVO {
 	private String stage;
 	
 	/**
-	 * @return the email_id
+	 * @return the email
 	 */
-	public String getEmail_id() {
-		return email_id;
+	public String getEmail() {
+		return email;
 	}
 	/**
-	 * @param email_id the email_id to set
+	 * @param email the email to set
 	 */
-	public void setEmail_id(String email_id) {
-		this.email_id = email_id;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	/**
 	 * @return the user_id
@@ -131,9 +131,9 @@ public class EventSubmitRequestVO {
 	 */
 	@Override
 	public String toString() {
-		return "EventSubmitRequestVO [user_id=" + user_id + ", email_id=" + email_id + ", evt_id=" + evt_id
-				+ ", variant_id=" + variant_id + ", exp_id=" + exp_id + ", layer_id=" + layer_id + ", channel_id="
-				+ channel_id + ", time=" + time + ", stage=" + stage + "]";
+		return "EventSubmitRequestVO [user_id=" + user_id + ", email=" + email + ", evt_id=" + evt_id + ", variant_id="
+				+ variant_id + ", exp_id=" + exp_id + ", layer_id=" + layer_id + ", channel_id=" + channel_id
+				+ ", time=" + time + ", stage=" + stage + "]";
 	}
 	
 }

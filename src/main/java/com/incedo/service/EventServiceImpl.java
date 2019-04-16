@@ -111,6 +111,7 @@ public class EventServiceImpl implements EventService {
 		try {
 			String requestJSON = mapper.writeValueAsString(eventSubmit);
 			System.out.println("requestJSON ::"+requestJSON);
+			System.out.println("postEventserviceApi ::"+postEventserviceApi);
 			URL url = new URL(postEventserviceApi);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
@@ -151,7 +152,7 @@ public class EventServiceImpl implements EventService {
 		eventSubmit.setLayer_id(experimentVariantVo.getLayerId());
 		eventSubmit.setChannel_id(experimentVariantVo.getChannelId());
 		eventSubmit.setStage(stage);
-		eventSubmit.setEmail_id(experimentVariantVo.getEmailId());
+		eventSubmit.setEmail(experimentVariantVo.getEmailId());
 		Instant instant = Instant.now();
 		Long timeStampSeconds = instant.getEpochSecond();
 		if(null != timeStampSeconds) {

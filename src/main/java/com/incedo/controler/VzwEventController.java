@@ -81,9 +81,9 @@ public class VzwEventController {
     			showNormalHeader(model, "gridwall");
     		}
     		eventUtilService.setModelAttribute(model, experimentVariantVo, checkoutPage, "gridwall", "grid_wall", null);
-    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "grid_wall");
+    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promo");
     		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
-    		//eventService.pushNewEvent(eventSubmit);
+    		eventService.pushNewEvent(eventSubmit);
     	}else {
     		model.addAttribute("error", "Missing User Id. Please provide User Id to proceed further.");
     		return "home";
@@ -119,14 +119,14 @@ public class VzwEventController {
     		}
     		
     		// Setting Attributes for UI
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, checkoutPage, "gridwall", "grid_wall", null);
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz"+checkoutPage, "gridwall", "grid_wall", null);
     		
     		// Generating new event
-    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "grid_wall");
+    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promo");
     		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
     		
     		// Pushing new Event
-    		//eventService.pushNewEvent(eventSubmit);
+    		eventService.pushNewEvent(eventSubmit);
     	}else {
     		model.addAttribute("error", "Missing User Id. Please provide User Id to proceed further.");
     		return "home";
@@ -149,10 +149,10 @@ public class VzwEventController {
     		} else {
     			showNormalHeader(model, "checkout");
     		}
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/promoPage/");
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/vz/promoPage/");
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "checkout");
     		System.out.println("eventSubmit::::Checkout::::"+eventSubmit.toString());
-    		//eventService.pushNewEvent(eventSubmit);
+    		eventService.pushNewEvent(eventSubmit);
     	}else {
     		model.addAttribute("error", "Missing User Id. Please provide User Id to proceed further.");
     		return "home";
