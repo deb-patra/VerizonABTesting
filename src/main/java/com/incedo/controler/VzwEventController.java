@@ -2,9 +2,12 @@ package com.incedo.controler;
 
 import java.util.Base64;
 
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -17,21 +20,14 @@ import com.incedo.commandVOs.ExperimentVariantVo;
 import com.incedo.service.EventService;
 import com.incedo.service.EventUtil;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Created by Deb.
  */
-@Slf4j
 @Controller
-public class EventController {
-
+public class VzwEventController {
 	
 	@Value("${checkout.page}")
     private String checkoutPage;
-	
-	@Value("${gridwall.page}")
-    private String griwallPage;
 	
 	@Value("${layer.id}")
     private int layerId;
@@ -39,51 +35,51 @@ public class EventController {
 	@Value("${channel.id}")
     private int channelId;
 	
-	@Value("${layer.id.ui}")
-    private String layerName;
-	
-	@Value("${channel.id.ui}")
-    private String channelName;
-	
 	@Value("${layer.id.reco}")
     private String layerIdReco;
 	
-	@Value("${layer.id.reco.ui}")
-    private String layerNameReco;
+	@Value("${trigger.email.list}")
+	private String emailList;
+	
+	@Value("${domain.name}")
+    private String domainName;
+	
 	
     private final EventService eventService;
     private final EventUtil eventUtilService;
+    private JavaMailSender sender;
 
 	/**
 	 * @param eventService
 	 * @param eventUtilService
+	 * @param sender
 	 */
-	public EventController(EventService eventService, EventUtil eventUtilService) {
+	public VzwEventController(EventService eventService, EventUtil eventUtilService, JavaMailSender sender) {
+		super();
 		this.eventService = eventService;
 		this.eventUtilService = eventUtilService;
+		this.sender = sender;
 	}
 
-	@RequestMapping({"/home","/",""})
+
+	@RequestMapping({"/vz/home","/vz/","/",""})
 	public String getHomePage() {
 		return "home";
 	}
 	
 	
-	@RequestMapping("/getCartPage")
+	@RequestMapping("/vz/getPromoPage")
     public String getGridwallPageWithoutParam(HttpServletRequest request, @RequestHeader(value="User-Agent", defaultValue="mobile") String userAgent, Model model) {
     	System.out.println("With in get gridwall details");
     	String userId = request.getParameter("userId");
     	String emailId = request.getParameter("emailId");
     	if(!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(emailId)) {
     		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
-    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("UI_GREEN_EXP")) {
-    			showGreenHeader(model, "gridwall");
-    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("UI_RED_EXP")) {
-    			showRedHeader(model, "gridwall");
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
+    			showEmailPromo(model, "gridwall");
     		} else {
     			showNormalHeader(model, "gridwall");
     		}
-    		setMessageAndRecos(model, experimentVariantVo);
     		eventUtilService.setModelAttribute(model, experimentVariantVo, checkoutPage, "gridwall", "grid_wall", null);
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "grid_wall");
     		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
@@ -102,26 +98,34 @@ public class EventController {
 	 * @return
 	 */
     
-    @RequestMapping("/cartPage/{userId}/{emailId}")
-    public String getGridwallPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
+    @RequestMapping("/vz/promoPage/{userId}/{emailId}")
+    public String getPromoPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
     	if(!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(emailId)) {
-    		//String encodedString = Base64.getEncoder().encodeToString(emailId.getBytes());
+    		
+    		// Decoding Email id
     		byte[] decodedBytes = Base64.getDecoder().decode(emailId);
     		String decodedString = new String(decodedBytes);
     		System.out.println("decodedString-->"+decodedString);
     		emailId = decodedString;
+    		
+    		// Getting event details for the passed in user id and email id
     		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
-    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("UI_GREEN_EXP")) {
-    			showGreenHeader(model, "gridwall");
-    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("UI_RED_EXP")) {
-    			showRedHeader(model, "gridwall");
+    		
+    		// Showing different Header info based on Experiment or Control
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
+    			showEmailPromo(model, "gridwall");
     		} else {
     			showNormalHeader(model, "gridwall");
     		}
-    		setMessageAndRecos(model, experimentVariantVo);
+    		
+    		// Setting Attributes for UI
     		eventUtilService.setModelAttribute(model, experimentVariantVo, checkoutPage, "gridwall", "grid_wall", null);
+    		
+    		// Generating new event
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "grid_wall");
     		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
+    		
+    		// Pushing new Event
     		//eventService.pushNewEvent(eventSubmit);
     	}else {
     		model.addAttribute("error", "Missing User Id. Please provide User Id to proceed further.");
@@ -130,7 +134,7 @@ public class EventController {
         return "gridwall";
     }
     
-    @RequestMapping("/checkoutPage/{userId}/{emailId}")
+    @RequestMapping("/vz/checkoutPage/{userId}/{emailId}")
     public String getCheckoutPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
     	System.out.println("With in get checkout details");
     	if(!StringUtils.isEmpty(userId)) {
@@ -140,15 +144,12 @@ public class EventController {
     		System.out.println("decodedString-->"+decodedString);
     		emailId = decodedString;
     		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
-    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("UI_GREEN_EXP")) {
-    			showGreenHeader(model, "checkout");
-    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("UI_RED_EXP")) {
-    			showRedHeader(model, "checkout");
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
+    			showEmailPromo(model, "checkout");
     		} else {
     			showNormalHeader(model, "checkout");
     		}
-    		setMessageAndRecos(model, experimentVariantVo);
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/cartPage/");
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/promoPage/");
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "checkout");
     		System.out.println("eventSubmit::::Checkout::::"+eventSubmit.toString());
     		//eventService.pushNewEvent(eventSubmit);
@@ -158,27 +159,7 @@ public class EventController {
     	}
         return "gridwall";
     }
-    public void showBlueHeader(Model model, String pageHeading) {
-		String eventColor = null;
-		String color = "blue";
-		if(!StringUtils.isEmpty(color) && "default".equals(color)) {
-			eventColor = "default";
-		} else {
-			eventColor = pageHeading + "_" + color;
-		}
-		model.addAttribute("eventColor", eventColor);
-    }
-    public void showRedHeader(Model model, String pageHeading) {
-		String eventColor = null;
-		String color = "red";
-		if(!StringUtils.isEmpty(color) && "default".equals(color)) {
-			eventColor = "default";
-		} else {
-			eventColor = pageHeading + "_" + color;
-		}
-		model.addAttribute("eventColor", eventColor);
-    }
-    public void showGreenHeader(Model model, String pageHeading) {
+    public void showEmailPromo(Model model, String pageHeading) {
 		String eventColor = "green";
 		String color = "green";
 		if(!StringUtils.isEmpty(color) && "default".equals(color)) {
@@ -189,33 +170,42 @@ public class EventController {
 		model.addAttribute("eventColor", eventColor);
     }
     
-    public void showLifeStyleModel(Model model) {
-    	model.addAttribute("eventColor", "recos3");
-    }
-    
-    public void showControlModel(Model model) {
-    	model.addAttribute("eventColor", "recos2");
-    }
-    
     public void showNormalHeader(Model model, String pageHeading) {
-    	showBlueHeader(model, pageHeading);
+    	String eventColor = null;
+		String color = "blue";
+		if(!StringUtils.isEmpty(color) && "default".equals(color)) {
+			eventColor = "default";
+		} else {
+			eventColor = pageHeading + "_" + color;
+		}
+		model.addAttribute("eventColor", eventColor);
     }
     
-    public void setMessageAndRecos(Model model, ExperimentVariantVo experimentVariantVo) {
-    	String variantToken = experimentVariantVo.getVariantToken();
-    	if(!StringUtils.isEmpty(variantToken)) {
-    		if("message_var1".equalsIgnoreCase(variantToken)) {
-    			model.addAttribute("eventColor", "Message_123");
-    		} else if("message_var2".equalsIgnoreCase(variantToken)) {
-    			model.addAttribute("eventColor", "Message_456");
-    		} else if("message_var3".equalsIgnoreCase(variantToken)) {
-    			model.addAttribute("eventColor", "Message_789");
-    		} else if("recos_2".equalsIgnoreCase(variantToken)) {
-    			model.addAttribute("eventColor", "recos2");
-    		} else if("recos_3".equalsIgnoreCase(variantToken)) {
-    			model.addAttribute("eventColor", "recos3");
-    		}
-    	}
+    @RequestMapping("/sendEmails/{userId}")
+    public String triggerEmails(@PathVariable String userId, Model model) {
+    	String[] emails = emailList.split(",");
+    	try {
+    		for(int i=0; i < emails.length; i++) {
+            	System.out.println("emails[i]----------->"+emails[i]);
+				sendEmail(emails[i], userId);
+			} 
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+        model.addAttribute("emailList",emailList);
+        return "emailSuccess";
     }
     
+    public void sendEmail(String emailId, String userId) throws Exception {
+    	System.out.println("--------Triggering email-------");
+        MimeMessage message = sender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        String encodedString = Base64.getEncoder().encodeToString(emailId.getBytes());
+        String url = domainName+userId+"/"+encodedString;
+        System.out.println("--------encodedString-------"+encodedString+", -----------url---------"+url);
+        helper.setTo(emailId);
+        helper.setText("<html><body>Hi There! <a href=\""+url+"\">click here</a><body></html>", true);
+        helper.setSubject("VZW AB Testing - Email event Testing");
+        sender.send(message);
+    }
 }

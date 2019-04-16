@@ -19,12 +19,9 @@ import com.fasterxml.uuid.Generators;
 import com.incedo.commandVOs.EventSubmitRequestVO;
 import com.incedo.commandVOs.ExperimentVariantVo;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Created by Deb.
  */
-@Slf4j
 @Service
 public class EventServiceImpl implements EventService {
 	
@@ -34,15 +31,9 @@ public class EventServiceImpl implements EventService {
 	 @Value("${postevent.api.url}")
      private String postEventserviceApi;
 	 
-	 @Value("${layer.id.ui}")
-	 private String layerNameConfig;
-		
-	@Value("${channel.id.ui}")
-    private String channelNameConfig;
 		
 	@Override
 	public ExperimentVariantVo getEventJsonFromServiceAPI(String userId, String emailId, int layerId, int channelId) {
-		//log.debug("EventServiceImpl : getEventId : userId - "+userId);
 		URL url;
 		String jsonString = null;
 		//String apiUrl = serviceApi +"?channel_id="+channelId+"&layer_id="+layerId+"&user_id="+userId;
@@ -105,67 +96,14 @@ public class EventServiceImpl implements EventService {
 		experimentVariantVo.setExpId(expId);
 		experimentVariantVo.setVariantId(variantId);
 		experimentVariantVo.setExptName(exptName);
-		experimentVariantVo.setLayerName(StringUtils.isEmpty(layerName)?layerNameConfig:layerName);
-		experimentVariantVo.setChannelName(StringUtils.isEmpty(channelName)?channelNameConfig:channelName);
+		experimentVariantVo.setLayerName(layerName);
+		experimentVariantVo.setChannelName(channelName);
 		experimentVariantVo.setUserId(userId);
 		experimentVariantVo.setEmailId(emailId);
 		experimentVariantVo.setLayerId(layerId);
 		experimentVariantVo.setChannelId(channelId);
 		return experimentVariantVo;
 	}
-
-	/*
-	@Override
-	public void pushNewEvent(String userId, String channelId, String layerId, String expId, String variantId, String stage) {
-		EventSubmitRequestVO eventSubmit = new EventSubmitRequestVO();
-		eventSubmit.setUser_id(userId);
-		UUID uuid = Generators.timeBasedGenerator().generate();
-		//eventSubmit.setEvt_id(uuid.clockSequence());
-		eventSubmit.setEvt_id(uuid.toString());
-		eventSubmit.setVariant(variantId);
-		eventSubmit.setChannel_id(channelId);
-		eventSubmit.setExp_id(expId);
-		
-		eventSubmit.setStage(stage);
-		eventSubmit.setTime(new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
-		
-		
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			String requestJSON = mapper.writeValueAsString(eventSubmit);
-			System.out.println("requestJSON ::"+requestJSON);
-			pushEvent(requestJSON);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-	}
-	*/
-	public void pushEvent(String requestJSON) {
-		try {
-			URL url = new URL(postEventserviceApi);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
-			OutputStream os = conn.getOutputStream();
-			os.write(requestJSON.getBytes());
-			os.flush();
-			if (conn.getResponseCode() != 200) {
-				throw new RuntimeException("Failed : HTTP error code : "
-						+ conn.getResponseCode());
-			}
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					(conn.getInputStream())));
-			String output;
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-			conn.disconnect();
-		  } catch (IOException e) {
-			e.printStackTrace();
-		 }
-
-		}
 
 	@Override
 	public void pushNewEvent(EventSubmitRequestVO eventSubmit ) {
