@@ -114,9 +114,9 @@ public class VzwEventController {
     		
     		// Showing different Header info based on Experiment or Control
     		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
-    			showEmailPromo(model, "gridwall");
+    			showEmailPromo(model, "promo");
     		} else {
-    			showNormalHeader(model, "gridwall");
+    			showNormalHeader(model, "promo");
     		}
     		
     		// Setting Attributes for UI
@@ -161,19 +161,19 @@ public class VzwEventController {
         return "gridwall";
     }
     public void showEmailPromo(Model model, String pageHeading) {
-		if("gridwall".equalsIgnoreCase(pageHeading)) {
-			model.addAttribute("eventColor", "Variation 1 - music streaming");
+		if("promo".equalsIgnoreCase(pageHeading)) {
+			model.addAttribute("eventColor", "Variation1");
 		} else {
-			model.addAttribute("eventColor", "Plan Upgrade success");
+			model.addAttribute("eventColor", "PlanUpgradeSuccess");
 		}
 		
     }
     
     public void showNormalHeader(Model model, String pageHeading) {
-    	if("gridwall".equalsIgnoreCase(pageHeading)) {
-    		model.addAttribute("eventColor", "Variation 2 - video streaming");
+    	if("promo".equalsIgnoreCase(pageHeading)) {
+    		model.addAttribute("eventColor", "Variation2");
 		} else {
-			model.addAttribute("eventColor", "Plan Upgrade success");
+			model.addAttribute("eventColor", "PlanUpgradeSuccess");
 		}
 		
     }
@@ -231,12 +231,14 @@ public class VzwEventController {
                  + "<div>"
                     + "<div></div>"
                     + "<div>"
-                    + "<a href=\""+url+"\"><img src='http://ec2-18-211-84-216.compute-1.amazonaws.com/images/"+imageName+"' style='float:left;width:600px;height:600px;'/></a>"
+                    + "<a href=\""+url+"\"><img src='http://ec2-18-211-84-216.compute-1.amazonaws.com/images/"+imageName+"'/></a>"
                     + "<div></div>"  + "<div>"
                     + "<img src=\""+openMailUrl+"\" style='float:left;width:1px;height:1px;'/>"
                     + "</div>"
                     + "</br>"
-                  + "</div></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br><a href=\""+url+"\">Click Promo</a></body>"
+                  + "</div>"+""
+                  	+ "</br>"
+                    +"<a href=\""+url+"\">Click Promo</a></body>"
                 + "</html>", true);
         /*helper.addInline("rightSideImage",
                 new File("C:\\deb\\Spring\\ABTesting\\VerizonABTesting\\src\\main\\resources\\static\\images\\cart_blue.png"));
