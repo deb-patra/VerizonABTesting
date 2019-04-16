@@ -222,7 +222,7 @@ public class VzwEventController {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         String encodedString = Base64.getEncoder().encodeToString(emailId.getBytes());
         String url = domainName+"/promoPage/"+userId+"/"+encodedString;
-        String openMailUrl = domainName+"/vz/sendEmails/"+userId+"/"+encodedString;
+        String openMailUrl = domainName+"/sendEmails/"+userId+"/"+encodedString;
         System.out.println("--------encodedString-------"+encodedString+", -----------url---------"+url+"-------openMailUrl--------"+openMailUrl);
         helper.setTo(emailId);
         helper.setText(
