@@ -134,7 +134,7 @@ public class VzwEventController {
         return "gridwall";
     }
     
-    @RequestMapping("/vz/checkoutPage/{userId}/{emailId}")
+    @RequestMapping("/checkoutPage/{userId}/{emailId}")
     public String getCheckoutPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
     	System.out.println("With in get checkout details");
     	if(!StringUtils.isEmpty(userId)) {
