@@ -1,6 +1,5 @@
 package com.incedo.controler;
 
-import java.io.File;
 import java.util.Base64;
 
 import javax.mail.internet.MimeMessage;
@@ -193,19 +192,6 @@ public class VzwEventController {
         return "emailSuccess";
     }
     
-    @RequestMapping("/sendEmails/{userId}/{emailId}")
-    public String openEmailEvent(@PathVariable String userId, @PathVariable String emailId, Model model) {
-    	byte[] decodedBytes = Base64.getDecoder().decode(emailId);
-		String decodedString = new String(decodedBytes);
-		System.out.println("decodedString-->"+decodedString);
-		emailId = decodedString;
-    	ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
-    	EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "openEmail");
-		System.out.println("eventSubmit::::email::::"+eventSubmit.toString());
-		eventService.pushNewEvent(eventSubmit);
-        return "emailSuccess";
-    }
-    
     public void sendEmail(String emailId, String userId) throws Exception {
     	System.out.println("--------Triggering email-------");
     	ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
@@ -225,7 +211,7 @@ public class VzwEventController {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         String encodedString = Base64.getEncoder().encodeToString(emailId.getBytes());
         String url = domainName+"/promoPage/"+userId+"/"+encodedString;
-        String openMailUrl = domainName+"/sendEmails/"+userId+"/"+encodedString;
+        String openMailUrl = domainName+"/openEmailsEvent/"+userId+"/"+encodedString;
         System.out.println("--------encodedString-------"+encodedString+", -----------url---------"+url+"-------openMailUrl--------"+openMailUrl);
         helper.setTo(emailId);
         helper.setText(
