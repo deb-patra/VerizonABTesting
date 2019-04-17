@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<body>
-		<jsp:include page="header.jsp"/>
-		<form action="/getGridwall" method="post">
+		<form action="/vz/getPromoPage" method="post">
 			<section class="container-section">
 				<div style="background-color:grey; width:70%">
 		        	<h1>Home Page Updated</h1>
@@ -14,6 +13,9 @@
 				<div class="panel-body">
 					<p class="oblique">Please enter User Id: </p>
 					<input type="text" id="userId" name="userId" value="" />
+					</br>
+					<p class="oblique">Please enter Email Id: </p>
+					<input type="text" id="emailId" name="emailId" value="" />
 					<input type="submit" value = "Get Details" class="btn-primary">
 				</div>
 			</section>

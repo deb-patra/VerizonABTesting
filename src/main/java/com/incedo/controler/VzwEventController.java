@@ -11,12 +11,15 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.incedo.commandVOs.EventSubmitRequestVO;
 import com.incedo.commandVOs.ExperimentVariantVo;
+import com.incedo.exception.ServiceException;
 import com.incedo.service.EventService;
 import com.incedo.service.EventUtil;
 
@@ -80,7 +83,7 @@ public class VzwEventController {
     		} else {
     			showNormalHeader(model, "gridwall");
     		}
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, checkoutPage, "gridwall", "grid_wall", null);
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz"+checkoutPage, "gridwall", "grid_wall", null);
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promo");
     		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
     		eventService.pushNewEvent(eventSubmit);
@@ -228,5 +231,12 @@ public class VzwEventController {
             helper.setSubject(subject);
             sender.send(message);
 		}
+    }
+    
+    @ExceptionHandler(ServiceException.class)
+    public ModelAndView handleServiceException() {
+    	ModelAndView model = new ModelAndView();
+    	model.setViewName("serviceError");
+    	return model;
     }
 }

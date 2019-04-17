@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.uuid.Generators;
 import com.incedo.commandVOs.EventSubmitRequestVO;
 import com.incedo.commandVOs.ExperimentVariantVo;
+import com.incedo.exception.ServiceException;
 
 /**
  * Created by Deb.
@@ -45,7 +46,7 @@ public class EventServiceImpl implements EventService {
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
 			if (conn.getResponseCode() != 200) {
-				throw new RuntimeException("Failed : HTTP error code : "
+				throw new ServiceException("Failed : HTTP error code : "
 						+ conn.getResponseCode());
 			}
 
@@ -121,7 +122,7 @@ public class EventServiceImpl implements EventService {
 			os.write(requestJSON.getBytes());
 			os.flush();
 			if (conn.getResponseCode() != 200) {
-				throw new RuntimeException("Failed : HTTP error code : "
+				throw new ServiceException("Failed : HTTP error code : "
 						+ conn.getResponseCode());
 			}
 			BufferedReader br = new BufferedReader(new InputStreamReader(
