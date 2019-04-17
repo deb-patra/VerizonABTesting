@@ -200,36 +200,33 @@ public class VzwEventController {
     	if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
     		imageName = "email-music.png";
     		subject = "VZW AB Testing - Email experiment Testing";
-		} else {
-			subject = "VZW AB Testing - Email control Testing";
-			imageName = "email-video.png";
+    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promoEmail");
+    		System.out.println("eventSubmit::::email::::"+eventSubmit.toString());
+    		eventService.pushNewEvent(eventSubmit);
+            MimeMessage message = sender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            String encodedString = Base64.getEncoder().encodeToString(emailId.getBytes());
+            String url = domainName+"/promoPage/"+userId+"/"+encodedString;
+            String openMailUrl = domainName+"/openEmailsEvent/"+userId+"/"+encodedString;
+            System.out.println("--------encodedString-------"+encodedString+", -----------url---------"+url+"-------openMailUrl--------"+openMailUrl);
+            helper.setTo(emailId);
+            helper.setText(
+                    "<html>"
+                    + "<body>"
+                     + "<div>"
+                        + "<div></div>"
+                        + "<div>"
+                        + "<a href=\""+url+"\"><img src='http://ec2-18-211-84-216.compute-1.amazonaws.com/images/"+imageName+"'/></a>"
+                        + "<div></div>"  + "<div>"
+                        + "<img src=\""+openMailUrl+"\" style='float:left;width:1px;height:1px;'/>"
+                        + "</div>"
+                        + "</br>"
+                      + "</div>"+""
+                      	+ "</br>"
+                        +"<a href=\""+url+"\">Click Promo</a></body>"
+                    + "</html>", true);
+            helper.setSubject(subject);
+            sender.send(message);
 		}
-    	EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promoEmail");
-		System.out.println("eventSubmit::::email::::"+eventSubmit.toString());
-		eventService.pushNewEvent(eventSubmit);
-        MimeMessage message = sender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String encodedString = Base64.getEncoder().encodeToString(emailId.getBytes());
-        String url = domainName+"/promoPage/"+userId+"/"+encodedString;
-        String openMailUrl = domainName+"/openEmailsEvent/"+userId+"/"+encodedString;
-        System.out.println("--------encodedString-------"+encodedString+", -----------url---------"+url+"-------openMailUrl--------"+openMailUrl);
-        helper.setTo(emailId);
-        helper.setText(
-                "<html>"
-                + "<body>"
-                 + "<div>"
-                    + "<div></div>"
-                    + "<div>"
-                    + "<a href=\""+url+"\"><img src='http://ec2-18-211-84-216.compute-1.amazonaws.com/images/"+imageName+"'/></a>"
-                    + "<div></div>"  + "<div>"
-                    + "<img src=\""+openMailUrl+"\" style='float:left;width:1px;height:1px;'/>"
-                    + "</div>"
-                    + "</br>"
-                  + "</div>"+""
-                  	+ "</br>"
-                    +"<a href=\""+url+"\">Click Promo</a></body>"
-                + "</html>", true);
-        helper.setSubject(subject);
-        sender.send(message);
     }
 }
