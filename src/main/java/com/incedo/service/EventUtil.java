@@ -19,11 +19,7 @@ import com.incedo.commandVOs.ExperimentVariantVo;
 public class EventUtil {
 	
 	public String incedoGetVariantToken(ExperimentVariantVo experimentVariantVo) {
-		String variantToken = experimentVariantVo.getVariantToken();
-		if(!StringUtils.isEmpty(variantToken) && variantToken.toLowerCase().contains("email")) {
-			return "EMAIL_PROMO_EXP";
-		}
-		return "control";
+		return experimentVariantVo.getVariantToken();
 	}
 	
 	public void setModelAttribute(Model model, ExperimentVariantVo experimentVariantVo, String nextPage, String pageHeading, String stage, String previousPage) {

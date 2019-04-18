@@ -75,8 +75,10 @@ public class VzwEventController {
     	String emailId = request.getParameter("emailId");
     	if(!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(emailId)) {
     		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
-    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
-    			showEmailPromo(model, "gridwall");
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MUSIC")) {
+    			showEmailMusicPromo(model, "promo");
+    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MEDIA")) {
+    			showEmailMediaPromo(model, "promo");
     		} else {
     			showNormalHeader(model, "gridwall");
     		}
@@ -112,8 +114,10 @@ public class VzwEventController {
     		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
     		
     		// Showing different Header info based on Experiment or Control
-    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
-    			showEmailPromo(model, "promo");
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MUSIC")) {
+    			showEmailMusicPromo(model, "promo");
+    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MEDIA")) {
+    			showEmailMediaPromo(model, "promo");
     		} else {
     			showNormalHeader(model, "promo");
     		}
@@ -144,8 +148,10 @@ public class VzwEventController {
     		System.out.println("decodedString-->"+decodedString);
     		emailId = decodedString;
     		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
-    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
-    			showEmailPromo(model, "checkout");
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MUSIC")) {
+    			showEmailMusicPromo(model, "checkout");
+    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MEDIA")) {
+    			showEmailMediaPromo(model, "checkout");
     		} else {
     			showNormalHeader(model, "checkout");
     		}
@@ -159,9 +165,18 @@ public class VzwEventController {
     	}
         return "gridwall";
     }
-    public void showEmailPromo(Model model, String pageHeading) {
+    public void showEmailMusicPromo(Model model, String pageHeading) {
 		if("promo".equalsIgnoreCase(pageHeading)) {
 			model.addAttribute("eventColor", "Variation1");
+		} else {
+			model.addAttribute("eventColor", "PlanUpgradeSuccess");
+		}
+		
+    }
+    
+    public void showEmailMediaPromo(Model model, String pageHeading) {
+		if("promo".equalsIgnoreCase(pageHeading)) {
+			model.addAttribute("eventColor", "Variation2");
 		} else {
 			model.addAttribute("eventColor", "PlanUpgradeSuccess");
 		}
@@ -193,9 +208,17 @@ public class VzwEventController {
     	ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerId, channelId);
     	String imageName = null;
     	String subject = null;
-    	if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("EMAIL_PROMO_EXP")) {
-    		imageName = "email-music.png";
-    		subject = "VZW AB Testing - Email experiment Testing";
+    	boolean isExperiment = false;
+    	if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MUSIC")) {
+			imageName = "email-music.png";
+    		subject = "VZW AB Email Testing - Music Variant";
+    		isExperiment = true;
+		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MEDIA")) {
+			imageName = "email-video.png";
+    		subject = "VZW AB Email Testing - Media Variant";
+    		isExperiment = true;
+		} 
+    	if(isExperiment) {
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promoEmail");
     		System.out.println("eventSubmit::::email::::"+eventSubmit.toString());
     		eventService.pushNewEvent(eventSubmit);
@@ -223,7 +246,7 @@ public class VzwEventController {
                     + "</html>", true);
             helper.setSubject(subject);
             sender.send(message);
-		}
+    	}
     }
     
     @ExceptionHandler(ServiceException.class)
