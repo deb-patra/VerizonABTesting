@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 	<body>
-		<jsp:include page="header.jsp"/>
 		<section class="container-section">
 			<p>Email has been sent to the following emailIds</p>
 			<div class="panel-body">

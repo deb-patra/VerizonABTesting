@@ -41,9 +41,6 @@ public class VzwEventController {
 	@Value("${layer.id.reco}")
     private String layerIdReco;
 	
-	@Value("${trigger.email.list}")
-	private String emailList;
-	
 	@Value("${domain.name}")
     private String domainName;
 	
@@ -180,18 +177,14 @@ public class VzwEventController {
 		
     }
     
-    @RequestMapping("/sendEmails/{userId}")
-    public String triggerEmails(@PathVariable String userId, Model model) {
-    	String[] emails = emailList.split(",");
+    @RequestMapping("/sendEmails/{userId}/{emailId}")
+    public String triggerEmails(@PathVariable String userId, @PathVariable String emailId, Model model) {
     	try {
-    		for(int i=0; i < emails.length; i++) {
-            	System.out.println("emails[i]----------->"+emails[i]);
-				sendEmail(emails[i], userId);
-			} 
+    		sendEmail(emailId, userId);
     	}catch (Exception e) {
 			e.printStackTrace();
 		}
-        model.addAttribute("emailList",emailList);
+        model.addAttribute("emailList",emailId);
         return "emailSuccess";
     }
     
