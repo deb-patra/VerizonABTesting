@@ -212,13 +212,13 @@ public class VzwEventController {
                      + "<div>"
                         + "<div></div>"
                         + "<div>"
-                        + "<a href=\""+url+"\"><img src='http://ec2-18-211-84-216.compute-1.amazonaws.com/images/"+imageName+"'/></a>"
+                        + "<a href=\""+url+"\"><img src='http://ec2-18-211-84-216.compute-1.amazonaws.com/images/"+imageName+"' style='float:left;width:450px;height:750px;'/></a>"
                         + "<div></div>"  + "<div>"
                         + "<img src=\""+openMailUrl+"\" style='float:left;width:1px;height:1px;'/>"
                         + "</div>"
                         + "</br>"
                       + "</div>"+""
-                      	+ "</br>"
+                      	+ "</br></br></br></br></br> </br></br></br></br></br> </br></br></br></br></br> </br></br></br></br></br> </br></br></br></br></br></br></br></br></br> </br></br></br></br></br></br></br></br>"
                         +"<a href=\""+url+"\">Click Promo</a></body>"
                     + "</html>", true);
             helper.setSubject(subject);
