@@ -44,6 +44,17 @@ public class VzwEventController {
 	@Value("${domain.name}")
     private String domainName;
 	
+	@Value("${layer.UI.id}")
+    private int layerIdUIExp;
+	
+	@Value("${channel.UI.id}")
+    private int channelIdUIExp;
+	
+	@Value("${layer.ML.id}")
+    private int layerIdMLExp;
+	
+	@Value("${channel.ML.id}")
+    private int channelIdMLExp;
 	
     private final EventService eventService;
     private final EventUtil eventUtilService;
@@ -165,6 +176,80 @@ public class VzwEventController {
     	}
         return "gridwall";
     }
+    
+    @RequestMapping("/gridwallPage/{userId}/{emailId}")
+    public String getGridwallPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
+    	if(!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(emailId)) {
+    		
+    		// Decoding Email id
+    		byte[] decodedBytes = Base64.getDecoder().decode(emailId);
+    		String decodedString = new String(decodedBytes);
+    		System.out.println("decodedString-->"+decodedString);
+    		emailId = decodedString;
+    		
+    		// Getting event details for the passed in user id and email id
+    		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerIdUIExp, channelIdUIExp);
+    		
+    		// Showing different Header info based on Experiment or Control
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MUSIC")) {
+    			showEmailMusicPromo(model, "checkout");
+    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MEDIA")) {
+    			showEmailMediaPromo(model, "checkout");
+    		} else {
+    			showNormalHeader(model, "checkout");
+    		}
+    		
+    		// Setting Attributes for UI
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz"+checkoutPage, "gridwall", "grid_wall", null);
+    		
+    		// Generating new event
+    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promo");
+    		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
+    		
+    		// Pushing new Event
+    		eventService.pushNewEvent(eventSubmit);
+    	}else {
+    		model.addAttribute("error", "Missing User Id. Please provide User Id to proceed further.");
+    		return "home";
+    	}
+        return "gridwall";
+    }
+    
+    @RequestMapping("/checkoutExpPage/{userId}/{emailId}")
+    public String getCheckoutNewExpPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
+    	if(!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(emailId)) {
+    		// Decoding Email id
+    		byte[] decodedBytes = Base64.getDecoder().decode(emailId);
+    		String decodedString = new String(decodedBytes);
+    		System.out.println("decodedString-->"+decodedString);
+    		emailId = decodedString;
+    		
+    		// Getting event details for the passed in user id and email id
+    		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerIdUIExp, channelIdUIExp);
+    		
+    		// Showing different Header info based on Experiment or Control
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MUSIC")) {
+    			showEmailMusicPromo(model, "promo");
+    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MEDIA")) {
+    			showEmailMediaPromo(model, "promo");
+    		} else {
+    			showNormalHeader(model, "promo");
+    		}
+    		
+    		// Setting Attributes for UI
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/vz/promoPage/");
+    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "checkout");
+    		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
+    		
+    		// Pushing new Event
+    		eventService.pushNewEvent(eventSubmit);
+    	}else {
+    		model.addAttribute("error", "Missing User Id. Please provide User Id to proceed further.");
+    		return "home";
+    	}
+        return "gridwall";
+    }
+    
     public void showEmailMusicPromo(Model model, String pageHeading) {
 		if("promo".equalsIgnoreCase(pageHeading)) {
 			model.addAttribute("eventColor", "Variation1");
@@ -195,7 +280,7 @@ public class VzwEventController {
     @RequestMapping("/sendEmails/{userId}/{emailId}")
     public String triggerEmails(@PathVariable String userId, @PathVariable String emailId, Model model) {
     	try {
-    		sendEmail(emailId, userId);
+    		sendEmail(emailId, userId);    		
     	}catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -254,5 +339,56 @@ public class VzwEventController {
     	ModelAndView model = new ModelAndView();
     	model.setViewName("serviceError");
     	return model;
+    }
+    
+    @RequestMapping("/promoExpPage/{userId}")
+    public String getPromoMDPage(@PathVariable String userId, Model model) {
+    	if(!StringUtils.isEmpty(userId)) {
+    		
+    		// Getting event details for the passed in user id and email id
+    		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, null, layerIdMLExp, channelIdMLExp);
+    		
+    		// Showing different Header info based on Experiment or Control
+    		if(eventUtilService.incedoGetVariantTokenMLExp(experimentVariantVo).equalsIgnoreCase("ML_Model_Experiments")) {
+    			showEmailMusicPromo(model, "promo");
+    		} else {
+    			showNormalHeader(model, "promo");
+    		}
+    		
+    		// Setting Attributes for UI
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz/checkoutExpPage", "gridwall", "grid_wall", null);
+    		
+    		// Generating new event
+    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promoEmail");
+    		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
+    		
+    		// Pushing new Event
+    		eventService.pushNewEvent(eventSubmit);
+    	}else {
+    		model.addAttribute("error", "Missing User Id. Please provide User Id to proceed further.");
+    		return "home";
+    	}
+        return "gridwall";
+    }
+    
+    @RequestMapping("/checkoutExpPage/{userId}")
+    public String getCheckoutMDPage(@PathVariable String userId, Model model) {
+    	System.out.println("With in get checkout details");
+    	if(!StringUtils.isEmpty(userId)) {
+    		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, null, layerIdMLExp, channelIdMLExp);
+    		if(eventUtilService.incedoGetVariantTokenMLExp(experimentVariantVo).equalsIgnoreCase("ML_Model_Experiments")) {
+    			showEmailMusicPromo(model, "checkout");
+    		} else {
+    			showNormalHeader(model, "checkout");
+    		}
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/vz/promoExpPage/");
+    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "checkout");
+    		System.out.println("eventSubmit::::Checkout::::"+eventSubmit.toString());
+    		eventService.pushNewEvent(eventSubmit);
+    	}else {
+    		model.addAttribute("error", "Missing User Id. Please provide User Id to proceed further.");
+    		return "home";
+    	}
+        return "gridwall";
     }
 }

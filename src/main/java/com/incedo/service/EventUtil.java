@@ -22,22 +22,42 @@ public class EventUtil {
 		return experimentVariantVo.getVariantToken();
 	}
 	
+	public String incedoGetVariantTokenMLExp(ExperimentVariantVo experimentVariantVo) {
+		if(experimentVariantVo.getVariantToken().contains("Music")) {
+			return "ML_Model_Experiments";
+		}
+		return "ML_Model_Control";
+	}
+	
 	public void setModelAttribute(Model model, ExperimentVariantVo experimentVariantVo, String nextPage, String pageHeading, String stage, String previousPage) {
     	if(!StringUtils.isEmpty(experimentVariantVo.getVariantToken())) {
         	model.addAttribute("userId", experimentVariantVo.getUserId());
-        	model.addAttribute("emailId", experimentVariantVo.getEmailId());
+        	String encodedString = null;
+        	if(!StringUtils.isEmpty(experimentVariantVo.getEmailId())) {
+        		model.addAttribute("emailId", experimentVariantVo.getEmailId());
+        		encodedString = Base64.getEncoder().encodeToString(experimentVariantVo.getEmailId().getBytes());
+        	}
         	model.addAttribute("expToken", experimentVariantVo.getVariantToken());
         	model.addAttribute("expId", experimentVariantVo.getExpId());
         	model.addAttribute("expName", experimentVariantVo.getExptName());
         	model.addAttribute("channelName", experimentVariantVo.getChannelName());
         	model.addAttribute("layerName", experimentVariantVo.getLayerName());
         	model.addAttribute("pageHeading", pageHeading);
-        	String encodedString = Base64.getEncoder().encodeToString(experimentVariantVo.getEmailId().getBytes());
+        	
         	if(!StringUtils.isEmpty(nextPage)) {
-        		model.addAttribute("nextPage", nextPage+"/"+experimentVariantVo.getUserId()+"/"+encodedString);
+        		if(!StringUtils.isEmpty(experimentVariantVo.getEmailId())) {
+        			model.addAttribute("nextPage", nextPage+"/"+experimentVariantVo.getUserId()+"/"+encodedString);
+        		} else {
+        			model.addAttribute("nextPage", nextPage+"/"+experimentVariantVo.getUserId());
+        		}
         	}
         	if(!StringUtils.isEmpty(previousPage)) {
-        		model.addAttribute("previousPage", previousPage+experimentVariantVo.getUserId()+"/"+encodedString);
+        		if(!StringUtils.isEmpty(experimentVariantVo.getEmailId())) {
+        			model.addAttribute("previousPage", previousPage+experimentVariantVo.getUserId()+"/"+encodedString);
+        		} else {
+        			model.addAttribute("previousPage", previousPage+experimentVariantVo.getUserId());
+        		}
+        		
         	}
         }
     }

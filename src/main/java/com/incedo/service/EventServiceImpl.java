@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.uuid.Generators;
@@ -31,17 +32,18 @@ public class EventServiceImpl implements EventService {
 	 
 	 @Value("${postevent.api.url}")
      private String postEventserviceApi;
-	 
-		
+
 	@Override
 	public ExperimentVariantVo getEventJsonFromServiceAPI(String userId, String emailId, int layerId, int channelId) {
+		
 		URL url;
 		String jsonString = null;
-		//String apiUrl = serviceApi +"?channel_id="+channelId+"&layer_id="+layerId+"&user_id="+userId;
-		String apiUrl = serviceApi +"?channel_id="+channelId+"&layer_id="+layerId+"&user_id="+userId+"&email_id="+emailId;
-		System.out.println("apiUrl ::"+apiUrl);
+		UriComponentsBuilder componentsBuilder = UriComponentsBuilder.fromUriString(serviceApi)
+				.queryParam("channel_id", channelId).queryParam("layer_id", layerId).queryParam("user_id", userId);
+		System.out.println("componentsBuilder::"+componentsBuilder.toUriString());
+		
 		try {
-			url = new URL(apiUrl);
+			url = new URL(componentsBuilder.toUriString());
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
@@ -100,7 +102,9 @@ public class EventServiceImpl implements EventService {
 		experimentVariantVo.setLayerName(layerName);
 		experimentVariantVo.setChannelName(channelName);
 		experimentVariantVo.setUserId(userId);
-		experimentVariantVo.setEmailId(emailId);
+		if(!StringUtils.isEmpty(emailId)) {
+			experimentVariantVo.setEmailId(emailId);
+		}
 		experimentVariantVo.setLayerId(layerId);
 		experimentVariantVo.setChannelId(channelId);
 		return experimentVariantVo;

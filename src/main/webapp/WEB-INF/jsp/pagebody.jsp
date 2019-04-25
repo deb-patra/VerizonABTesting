@@ -9,7 +9,9 @@
 			         <thead class="thead-inverse">
 			         <tr>
 			             <th>User Id</th>
-			             <th>Email Id</th>
+			             <c:if test="${not empty emailId}">
+			             	<th>Email Id</th>
+			             </c:if>
 			             <th>Layer Name</th>
 			             <th>Channel Name</th>
 			             <th>Experiment Token</th>
@@ -19,7 +21,9 @@
 			         </thead>
 			         <tr>
 			             <td>${userId}</td>
-			             <td>${emailId}</td>
+			             <c:if test="${not empty emailId}">
+			             	<td>${emailId}</td>
+			             </c:if>
 			             <td>${layerName}</td>
 			             <td>${channelName}</td>
 			             <td>${expToken}</td>
