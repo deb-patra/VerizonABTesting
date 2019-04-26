@@ -199,7 +199,7 @@ public class VzwEventController {
     		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz/checkoutUIExpPage", "gridwall", "grid_wall", null);
     		
     		// Generating new event
-    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promo");
+    		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promoEmail");
     		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
     		
     		// Pushing new Event
