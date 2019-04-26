@@ -6,5 +6,5 @@
 	  	<a class="container-section" href="${previousPage}">Back</a>
 	</c:if>
 	<br>
-	<img style="max-width: 71%; height: auto; padding-left: 30px;" src="/images/${eventColor}.png"/>
+	<img style="max-width: 71%; height: auto; padding-left: 30px;" src="/vz/images/${eventColor}.png"/>
 </html>
