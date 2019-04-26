@@ -341,7 +341,7 @@ public class VzwEventController {
     	return model;
     }
     
-    @RequestMapping("/promoExpPage/{userId}")
+    @RequestMapping("/promoMLExpPage/{userId}")
     public String getPromoMDPage(@PathVariable String userId, Model model) {
     	if(!StringUtils.isEmpty(userId)) {
     		
@@ -371,7 +371,7 @@ public class VzwEventController {
         return "gridwall";
     }
     
-    @RequestMapping("/checkoutExpPage/{userId}")
+    @RequestMapping("/checkoutMLExpPage/{userId}")
     public String getCheckoutMDPage(@PathVariable String userId, Model model) {
     	System.out.println("With in get checkout details");
     	if(!StringUtils.isEmpty(userId)) {

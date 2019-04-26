@@ -23,7 +23,7 @@ public class EventUtil {
 	}
 	
 	public String incedoGetVariantTokenMLExp(ExperimentVariantVo experimentVariantVo) {
-		if(experimentVariantVo.getVariantToken().contains("Music")) {
+		if(experimentVariantVo.getVariantToken().toLowerCase().contains("ml_music")) {
 			return "ML_Model_Experiments";
 		}
 		return "ML_Model_Control";
