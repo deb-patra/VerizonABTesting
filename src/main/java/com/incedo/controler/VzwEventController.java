@@ -177,30 +177,26 @@ public class VzwEventController {
         return "gridwall";
     }
     
-    @RequestMapping("/gridwallPage/{userId}/{emailId}")
-    public String getGridwallPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
-    	if(!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(emailId)) {
-    		
-    		// Decoding Email id
-    		byte[] decodedBytes = Base64.getDecoder().decode(emailId);
-    		String decodedString = new String(decodedBytes);
-    		System.out.println("decodedString-->"+decodedString);
-    		emailId = decodedString;
-    		
+    @RequestMapping("/gridwallUIExpPage/{userId}")
+    public String getGridwallPage(@PathVariable String userId, Model model) {
+    	if(!StringUtils.isEmpty(userId)) {
+    	
     		// Getting event details for the passed in user id and email id
-    		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerIdUIExp, channelIdUIExp);
+    		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, null, layerIdUIExp, channelIdUIExp);
     		
     		// Showing different Header info based on Experiment or Control
-    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MUSIC")) {
-    			showEmailMusicPromo(model, "checkout");
-    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MEDIA")) {
-    			showEmailMediaPromo(model, "checkout");
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("BLUE_BUTTON")) {
+    			showBlueHeader(model, "gridwall");
+    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("GREEN_BUTTON")) {
+    			showBlueHeader(model, "gridwall");
+    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("RED_BUTTON")) {
+    			showRedHeader(model, "gridwall");
     		} else {
-    			showNormalHeader(model, "checkout");
+    			showNormal(model, "gridwall");
     		}
     		
     		// Setting Attributes for UI
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz"+checkoutPage, "gridwall", "grid_wall", null);
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz/checkoutUIExpPage", "gridwall", "grid_wall", null);
     		
     		// Generating new event
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promo");
@@ -215,29 +211,24 @@ public class VzwEventController {
         return "gridwall";
     }
     
-    @RequestMapping("/checkoutExpPage/{userId}/{emailId}")
-    public String getCheckoutNewExpPage(@PathVariable String userId, @PathVariable String emailId, Model model) {
-    	if(!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(emailId)) {
-    		// Decoding Email id
-    		byte[] decodedBytes = Base64.getDecoder().decode(emailId);
-    		String decodedString = new String(decodedBytes);
-    		System.out.println("decodedString-->"+decodedString);
-    		emailId = decodedString;
+    @RequestMapping("/checkoutUIExpPage/{userId}")
+    public String getCheckoutNewExpPage(@PathVariable String userId, Model model) {
+    	if(!StringUtils.isEmpty(userId)) {
     		
     		// Getting event details for the passed in user id and email id
-    		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, emailId, layerIdUIExp, channelIdUIExp);
+    		ExperimentVariantVo experimentVariantVo = eventService.getEventJsonFromServiceAPI(userId, null, layerIdUIExp, channelIdUIExp);
     		
     		// Showing different Header info based on Experiment or Control
-    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MUSIC")) {
-    			showEmailMusicPromo(model, "promo");
-    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("VZ_EMAIL_MEDIA")) {
-    			showEmailMediaPromo(model, "promo");
+    		if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("BLUE_BUTTON")) {
+    			showBlueHeader(model, "checkout");
+    		} else if(eventUtilService.incedoGetVariantToken(experimentVariantVo).equalsIgnoreCase("RED_BUTTON")) {
+    			showRedHeader(model, "checkout");
     		} else {
-    			showNormalHeader(model, "promo");
+    			showNormal(model, "checkout");
     		}
     		
     		// Setting Attributes for UI
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/vz/promoPage/");
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/vz/gridwallUIExpPage/");
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "checkout");
     		System.out.println("eventSubmit::::Gridwal::::"+eventSubmit.toString());
     		
@@ -271,6 +262,33 @@ public class VzwEventController {
     public void showNormalHeader(Model model, String pageHeading) {
     	if("promo".equalsIgnoreCase(pageHeading)) {
     		model.addAttribute("eventColor", "Variation2");
+		} else {
+			model.addAttribute("eventColor", "PlanUpgradeSuccess");
+		}
+		
+    }
+    
+    public void showBlueHeader(Model model, String pageHeading) {
+		if("gridwall".equalsIgnoreCase(pageHeading)) {
+			model.addAttribute("eventColor", "green_button");
+		} else {
+			model.addAttribute("eventColor", "PlanUpgradeSuccess");
+		}
+		
+    }
+    
+    public void showRedHeader(Model model, String pageHeading) {
+		if("gridwall".equalsIgnoreCase(pageHeading)) {
+			model.addAttribute("eventColor", "red_button");
+		} else {
+			model.addAttribute("eventColor", "PlanUpgradeSuccess");
+		}
+		
+    }
+    
+    public void showNormal(Model model, String pageHeading) {
+		if("gridwall".equalsIgnoreCase(pageHeading)) {
+			model.addAttribute("eventColor", "control_button");
 		} else {
 			model.addAttribute("eventColor", "PlanUpgradeSuccess");
 		}
@@ -356,7 +374,7 @@ public class VzwEventController {
     		}
     		
     		// Setting Attributes for UI
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz/checkoutExpPage", "gridwall", "grid_wall", null);
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, "/vz/checkoutMLExpPage", "gridwall", "grid_wall", null);
     		
     		// Generating new event
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "promoEmail");
@@ -381,7 +399,7 @@ public class VzwEventController {
     		} else {
     			showNormalHeader(model, "checkout");
     		}
-    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/vz/promoExpPage/");
+    		eventUtilService.setModelAttribute(model, experimentVariantVo, null, "checkout", "checkout", "/vz/promoMLExpPage/");
     		EventSubmitRequestVO eventSubmit = eventService.incedoEvent(experimentVariantVo, "checkout");
     		System.out.println("eventSubmit::::Checkout::::"+eventSubmit.toString());
     		eventService.pushNewEvent(eventSubmit);
