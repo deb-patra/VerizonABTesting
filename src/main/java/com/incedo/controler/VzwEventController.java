@@ -272,7 +272,7 @@ public class VzwEventController {
 		if("gridwall".equalsIgnoreCase(pageHeading)) {
 			model.addAttribute("eventColor", "green_button");
 		} else {
-			model.addAttribute("eventColor", "PlanUpgradeSuccess");
+			model.addAttribute("eventColor", "checkout");
 		}
 		
     }
@@ -281,7 +281,7 @@ public class VzwEventController {
 		if("gridwall".equalsIgnoreCase(pageHeading)) {
 			model.addAttribute("eventColor", "red_button");
 		} else {
-			model.addAttribute("eventColor", "PlanUpgradeSuccess");
+			model.addAttribute("eventColor", "checkout");
 		}
 		
     }
@@ -290,7 +290,7 @@ public class VzwEventController {
 		if("gridwall".equalsIgnoreCase(pageHeading)) {
 			model.addAttribute("eventColor", "control_button");
 		} else {
-			model.addAttribute("eventColor", "PlanUpgradeSuccess");
+			model.addAttribute("eventColor", "checkout");
 		}
 		
     }
